@@ -69,7 +69,7 @@ See .github/workflows/daily_tasks.yml to configure scheduled GitHub Actions to a
 ## Deployment
 You can deploy this dashboard easily via:
 
-1. Streamlit Cloud (recommended)
+1.Streamlit Cloud (recommended)
 
 2.Docker or VPS
 
