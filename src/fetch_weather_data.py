@@ -5,7 +5,8 @@ import pandas as pd
 import os
 from datetime import datetime
 from config import WEATHER_API_URL, WEATHER_API_KEY, LOCATION, DATA_FOLDER
-
+from dotenv import load_dotenv
+load_dotenv()
 def fetch_weather():
     params = {
         'q': LOCATION,

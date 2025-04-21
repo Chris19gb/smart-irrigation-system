@@ -155,8 +155,8 @@ if st.session_state.logged_in:
     # --- Trends ---
     def render_trend(title, path, value_col, color):
         if os.path.exists(path):
-            df = pd.read_csv(path, parse_dates=["timestamp"], dayfirst=True)
-            df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=True, errors="coerce")
+            df = pd.read_csv(path, parse_dates=["timestamp"], dayfirst=False)
+            df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=False, errors="coerce")
             df["date"] = df["timestamp"].dt.date
             last_7 = df[df["date"] >= (datetime.now().date() - pd.Timedelta(days=7))]
             st.markdown(f"### {title}")
