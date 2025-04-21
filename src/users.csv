@@ -1,0 +1,3 @@
+username,name,password(hashed),phone_number,email,password
+admin,Admin,smart123,+265 990 373 438,macdalfchristopher@email.com,
+Admin,Christopher Gama,,+265990373438,,8c29b0e30c508ccd66f15fe63fb12fda28f01b8cc7985522a09e63f423d0e4a7

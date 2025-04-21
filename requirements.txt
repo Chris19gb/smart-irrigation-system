@@ -1,0 +1,10 @@
+python-dotenv
+streamlit
+requests
+pandas
+twilio
+plotly
+folium
+streamlit-folium
+seaborn
+matplotlib
