@@ -5,7 +5,6 @@ st.set_page_config(page_title="Smart Irrigation System", layout="wide")
 from auth import validate_user, register_user, send_otp_sms, verify_otp, update_password
 import requests
 from config import WEATHER_API_URL, WEATHER_API_KEY, LOCATION
-st.write("🔑 WEATHER_API_KEY:", WEATHER_API_KEY)  # 🔒 TEMP: REMOVE after test
 from twilio.rest import Client
 import pandas as pd
 import plotly.express as px
