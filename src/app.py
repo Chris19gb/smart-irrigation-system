@@ -133,10 +133,14 @@ if st.session_state.logged_in:
     weather_condition = weather_data['weather'][0].get('description', 'unknown').capitalize()
     rainfall = weather_data.get("rain", {}).get("1h", 0) or 0
 
-    with open("data/soil_moisture_data.json") as f:
-        soil_data = json.load(f)
-    with open("data/ndvi_data.json") as f:
-        ndvi_data = json.load(f)
+    try:
+        with open("data/soil_moisture_data.json") as f:
+            soil_data = json.load(f)
+        with open("data/ndvi_data.json") as f:
+            ndvi_data = json.load(f)
+    except Exception as e:
+        st.error(f"Error loading soil or NDVI data: {e}")
+        st.stop()
 
     st.markdown("### Weather Summary - Mzuzu")
     col1, col2, col3, col4, col5 = st.columns(5)
