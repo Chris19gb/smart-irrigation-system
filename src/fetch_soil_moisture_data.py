@@ -2,7 +2,9 @@ import json
 import os
 import random
 from datetime import datetime
-from config import DATA_FOLDER
+
+# Ensure DATA_FOLDER is defined correctly
+DATA_FOLDER = "src/data"  # or load from config
 
 def fetch_soil_moisture_data():
     soil_moisture_data = {
