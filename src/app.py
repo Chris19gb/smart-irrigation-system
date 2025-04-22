@@ -105,20 +105,16 @@ if st.session_state.logged_in:
     st.markdown('<div class="main-title">Smart Irrigation System Dashboard</div>', unsafe_allow_html=True)
     st.markdown("---")
 
-    # ✅ Fixed function indentation
     def fetch_live_weather():
         params = {'q': LOCATION, 'appid': WEATHER_API_KEY, 'units': 'metric'}
         try:
             response = requests.get(WEATHER_API_URL, params=params)
             response.raise_for_status()
             data = response.json()
-
             os.makedirs("data", exist_ok=True)
             with open("data/weather_data.json", "w") as f:
                 json.dump(data, f, indent=4)
-
             return data
-
         except Exception as e:
             st.warning(f"⚠️ Live weather fetch failed: {e}")
             if os.path.exists("data/weather_data.json"):
@@ -214,10 +210,13 @@ if st.session_state.logged_in:
     sns.heatmap(np.random.uniform(0.2, 0.9, (10, 10)), cmap="Greens", ax=ax)
     st.pyplot(fig)
 
+    st.markdown("### 🌧️ Custom Rainfall Threshold")
+    rainfall_threshold = st.slider("Set your rainfall threshold (mm)", min_value=0.0, max_value=20.0, value=2.0)
+
     st.markdown("### Irrigation Recommendation")
-    if soil_data['soil_moisture_percent'] < 30 and rainfall < 2:
-        st.error("Soil is dry and no rain detected. Irrigation needed.")
-    elif soil_data['soil_moisture_percent'] > 50 and rainfall > 2:
+    if soil_data['soil_moisture_percent'] < 30 and rainfall < rainfall_threshold:
+        st.error("Soil is dry and rainfall is below threshold. Irrigation needed.")
+    elif soil_data['soil_moisture_percent'] > 50 and rainfall > rainfall_threshold:
         st.success("Moisture and rain levels are good.")
     else:
         st.info("Monitor conditions—irrigation might be needed soon.")

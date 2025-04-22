@@ -11,7 +11,7 @@ load_dotenv()
 # Load config values safely
 WEATHER_API_URL = os.getenv("WEATHER_API_URL", "https://api.openweathermap.org/data/2.5/weather")
 WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
-LOCATION = os.getenv("LOCATION", "Karonga")
+LOCATION = os.getenv("LOCATION", "Mzuzu")
 DATA_FOLDER = os.getenv("DATA_FOLDER", "data")
 
 def fetch_weather():
