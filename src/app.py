@@ -94,7 +94,7 @@ if st.session_state.logged_in:
         log_path = "alert_log.csv"
         if os.path.exists(log_path):
             log_df = pd.read_csv(log_path)
-            log_df["timestamp"] = pd.to_datetime(log_df["timestamp"], format="%d/%m/%Y %H:%M", dayfirst=False, errors="coerce")
+            log_df["timestamp"] = pd.to_datetime(log_df["timestamp"], errors="coerce")
             st.dataframe(log_df.sort_values(by="timestamp", ascending=False), use_container_width=True)
         else:
             st.info("No alert logs yet.")
@@ -123,40 +123,37 @@ if st.session_state.logged_in:
     with open("data/weather_data.json", "w") as f:
         json.dump(weather_data, f, indent=4)
 
-    # --- Weather Values ---
-    temp = weather_data['main']['temp']
-    humidity = weather_data['main']['humidity']
-    pressure = weather_data['main']['pressure']
-    wind_speed = weather_data['wind']['speed']
-    weather_condition = weather_data['weather'][0]['description']
+    temp = weather_data['main'].get('temp', 0)
+    humidity = weather_data['main'].get('humidity', 0)
+    pressure = weather_data['main'].get('pressure', 0)
+    wind_speed = weather_data['wind'].get('speed', 0)
+    weather_condition = weather_data['weather'][0].get('description', 'unknown').capitalize()
     rainfall = weather_data.get("rain", {}).get("1h", 0) or 0
 
-    # --- Soil & NDVI Data ---
     with open("data/soil_moisture_data.json") as f:
         soil_data = json.load(f)
     with open("data/ndvi_data.json") as f:
         ndvi_data = json.load(f)
 
-    # --- Weather Overview ---
-    st.markdown("###  Weather Summary - Mzuzu")
+    st.markdown("### Weather Summary - Mzuzu")
     col1, col2, col3, col4, col5 = st.columns(5)
-    col1.metric(" Temp (°C)", temp)
-    col2.metric(" Humidity", humidity)
-    col3.metric(" Pressure", pressure)
-    col4.metric(" Wind", wind_speed)
-    col5.metric(" Rainfall", rainfall)
-    st.info(f"Condition: **{weather_condition.title()}**")
+    col1.metric("Temp (°C)", temp)
+    col2.metric("Humidity (%)", humidity)
+    col3.metric("Pressure (hPa)", pressure)
+    col4.metric("Wind (m/s)", wind_speed)
+    col5.metric("Rainfall (mm)", rainfall)
+    st.info(f"Condition: **{weather_condition}**")
+
     st.plotly_chart(px.bar(pd.DataFrame({
         "Parameter": ["Temperature", "Humidity", "Pressure", "Wind Speed"],
         "Values": [temp, humidity, pressure, wind_speed]
     }), x="Parameter", y="Values", color="Parameter", title="Weather Overview",
     color_discrete_sequence=["#f4a261", "#2a9d8f", "#264653", "#e9c46a"]))
 
-    # --- Trends ---
     def render_trend(title, path, value_col, color):
         if os.path.exists(path):
             df = pd.read_csv(path, parse_dates=["timestamp"], dayfirst=False)
-            df["timestamp"] = pd.to_datetime(df["timestamp"], dayfirst=False, errors="coerce")
+            df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
             df["date"] = df["timestamp"].dt.date
             last_7 = df[df["date"] >= (datetime.now().date() - pd.Timedelta(days=7))]
             st.markdown(f"### {title}")
@@ -176,21 +173,19 @@ if st.session_state.logged_in:
         else:
             st.info(f"{title} data not available.")
 
-    render_trend(" Rainfall Trend", "data/rainfall_log.csv", "rainfall_mm", "Blues")
-    render_trend(" Temperature Trend", "data/temperature_log.csv", "temperature", "OrRd")
-    render_trend(" Soil Moisture Trend", "data/soil_log.csv", "soil_moisture_percent", "YlGn")
-    render_trend(" NDVI Trend", "data/ndvi_log.csv", "ndvi_index", "Greens")
-    render_trend(" Humidity Trend", "data/humidity_log.csv", "humidity", "PuBu")
+    render_trend("Rainfall Trend", "data/rainfall_log.csv", "rainfall_mm", "Blues")
+    render_trend("Temperature Trend", "data/temperature_log.csv", "temperature", "OrRd")
+    render_trend("Soil Moisture Trend", "data/soil_log.csv", "soil_moisture_percent", "YlGn")
+    render_trend("NDVI Trend", "data/ndvi_log.csv", "ndvi_index", "Greens")
+    render_trend("Humidity Trend", "data/humidity_log.csv", "humidity", "PuBu")
 
-    # --- KPIs ---
-    st.markdown("###  Smart Irrigation KPIs")
+    st.markdown("### Smart Irrigation KPIs")
     k1, k2, k3 = st.columns(3)
     k1.metric("Soil", "Low" if soil_data['soil_moisture_percent'] < 30 else "Optimal")
     k2.metric("NDVI", "Poor" if ndvi_data['ndvi_index'] < 0.4 else "Healthy")
     k3.metric("Rainfall", f"{rainfall} mm")
     st.divider()
 
-    # --- Pie + NDVI ---
     st.markdown("### 💧 Soil Moisture")
     st.metric("Moisture (%)", soil_data["soil_moisture_percent"])
     st.caption(f"Last Recorded: {soil_data['timestamp']}")
@@ -201,20 +196,18 @@ if st.session_state.logged_in:
         title="Soil Moisture Distribution"
     ))
 
-    st.markdown("###  NDVI Health")
+    st.markdown("### NDVI Health")
     st.metric("NDVI Index", ndvi_data['ndvi_index'])
     st.caption(f"Last Recorded: {ndvi_data['timestamp']}")
     st.plotly_chart(px.bar(x=["NDVI"], y=[ndvi_data['ndvi_index']],
                            color_discrete_sequence=["green"], title="NDVI Index"))
 
-    # --- NDVI Heatmap ---
-    st.markdown("### 🟩 NDVI Heatmap (Simulated)")
+    st.markdown("### 👉 NDVI Heatmap (Simulated)")
     fig, ax = plt.subplots(figsize=(6, 4))
     sns.heatmap(np.random.uniform(0.2, 0.9, (10, 10)), cmap="Greens", ax=ax)
     st.pyplot(fig)
 
-    # --- Recommendation ---
-    st.markdown("###  Irrigation Recommendation")
+    st.markdown("### Irrigation Recommendation")
     if soil_data['soil_moisture_percent'] < 30 and rainfall < 2:
         st.error("Soil is dry and no rain detected. Irrigation needed.")
     elif soil_data['soil_moisture_percent'] > 50 and rainfall > 2:
@@ -222,12 +215,13 @@ if st.session_state.logged_in:
     else:
         st.info("Monitor conditions—irrigation might be needed soon.")
 
-    # --- Map ---
-    st.markdown("###  Farm Location Map")
+    st.markdown("### Farm Location Map")
     m = folium.Map(location=[-11.45422, 34.04358], zoom_start=13)
-    folium.Marker([-11.45422, 34.04358],
-                  popup=f"Soil: {soil_data['soil_moisture_percent']}% | NDVI: {ndvi_data['ndvi_index']}",
-                  tooltip="Farm").add_to(m)
+    folium.Marker(
+        [-11.45422, 34.04358],
+        popup=f"Soil: {soil_data['soil_moisture_percent']}% | NDVI: {ndvi_data['ndvi_index']}",
+        tooltip="Farm"
+    ).add_to(m)
     st_folium(m, width=700, height=450)
 
     st.success("✅ Dashboard Loaded Successfully!")
