@@ -3,20 +3,28 @@ import json
 import pandas as pd
 import os
 from datetime import datetime
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Try using Streamlit secrets if running inside a Streamlit app
+try:
+    import streamlit as st
+    WEATHER_API_URL = st.secrets.get("WEATHER_API_URL", "https://api.openweathermap.org/data/2.5/weather")
+    WEATHER_API_KEY = st.secrets.get("WEATHER_API_KEY")
+    LOCATION = st.secrets.get("LOCATION", "Mzuzu,MW")
+    DATA_FOLDER = st.secrets.get("DATA_FOLDER", "data")
+except:
+    # Fallback to .env if not inside Streamlit
+    from dotenv import load_dotenv
+    load_dotenv()
 
-# Load config values safely
-WEATHER_API_URL = os.getenv("WEATHER_API_URL", "https://api.openweathermap.org/data/2.5/weather")
-WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
-LOCATION = os.getenv("LOCATION", "Mzuzu")
-DATA_FOLDER = os.getenv("DATA_FOLDER", "data")
+    WEATHER_API_URL = os.getenv("WEATHER_API_URL", "https://api.openweathermap.org/data/2.5/weather")
+    WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
+    LOCATION = os.getenv("LOCATION", "Mzuzu,MW")
+    DATA_FOLDER = os.getenv("DATA_FOLDER", "data")
+
 
 def fetch_weather():
     if not WEATHER_API_KEY:
-        print("❌ WEATHER_API_KEY is missing! Check your .env or secrets.")
+        print("❌ WEATHER_API_KEY is missing! Check your Streamlit secrets or .env file.")
         return
 
     params = {
@@ -32,7 +40,7 @@ def fetch_weather():
             data = response.json()
             os.makedirs(DATA_FOLDER, exist_ok=True)
 
-            # Save JSON
+            # Save raw weather data
             with open(os.path.join(DATA_FOLDER, 'weather_data.json'), 'w') as f:
                 json.dump(data, f, indent=4)
 
@@ -40,7 +48,7 @@ def fetch_weather():
             rain = data.get("rain", {}).get("1h") or data.get("rain", {}).get("3h") or 0
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            # Append to CSV log
+            # Log rainfall data
             log_path = os.path.join(DATA_FOLDER, 'rainfall_log.csv')
             df = pd.DataFrame([[timestamp, rain]], columns=["timestamp", "rainfall_mm"])
 
@@ -58,6 +66,6 @@ def fetch_weather():
     except Exception as e:
         print("❌ Error while fetching weather data:", str(e))
 
+
 if __name__ == "__main__":
     fetch_weather()
-
