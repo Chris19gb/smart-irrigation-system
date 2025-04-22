@@ -180,11 +180,11 @@ if st.session_state.logged_in:
         else:
             st.info(f"{title} data not available.")
 
-    render_trend("Rainfall Trend", "data/rainfall_log.csv", "rainfall_mm", "Blues")
-    render_trend("Temperature Trend", "data/temperature_log.csv", "temperature", "OrRd")
-    render_trend("Soil Moisture Trend", "data/soil_log.csv", "soil_moisture_percent", "YlGn")
-    render_trend("NDVI Trend", "data/ndvi_log.csv", "ndvi_index", "Greens")
-    render_trend("Humidity Trend", "data/humidity_log.csv", "humidity", "PuBu")
+    render_trend("Rainfall Trend", "src/data/rainfall_log.csv", "rainfall_mm", "Blues")
+    render_trend("Temperature Trend", "src/data/temperature_log.csv", "temperature", "OrRd")
+    render_trend("Soil Moisture Trend", "src/data/soil_log.csv", "soil_moisture_percent", "YlGn")
+    render_trend("NDVI Trend", "src/data/ndvi_log.csv", "ndvi_index", "Greens")
+    render_trend("Humidity Trend", "src/data/humidity_log.csv", "humidity", "PuBu")
 
     st.markdown("### Smart Irrigation KPIs")
     k1, k2, k3 = st.columns(3)
