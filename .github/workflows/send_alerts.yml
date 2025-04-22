@@ -1,0 +1,38 @@
+name: Daily Smart Irrigation Alerts
+
+on:
+  schedule:
+    - cron: "30 7 * * *"  # Runs every day at 7:30 AM UTC
+  workflow_dispatch:      # Allows manual triggering
+
+jobs:
+  send-alerts:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src
+    env:
+      WEATHER_API_URL: ${{ secrets.WEATHER_API_URL }}
+      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+      LOCATION: ${{ secrets.LOCATION }}
+      TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+      TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+      TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
+      EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: 📦 Install dependencies
+        run: |
+          pip install -r ../requirements.txt
+
+      - name: 🚀 Run Smart Irrigation Alert
+        run: python send_daily_alerts.py
