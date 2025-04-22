@@ -34,7 +34,8 @@ def log_alert(method, username, destination, message):
         "destination": destination,
         "message": message
     }
-    log_file = "alert_log.csv"
+    log_file = "data/alert_log.csv"
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
     file_exists = os.path.isfile(log_file)
 
     with open(log_file, "a", newline='', encoding="utf-8") as f:
@@ -89,11 +90,19 @@ def run_alert_check():
 
     rainfall = weather.get("rain", {}).get("1h", 0) or 0
 
-    with open("data/soil_moisture_data.json", "r") as f:
-        soil = json.load(f)
-    soil_moisture = soil['soil_moisture_percent']
+    try:
+        with open("data/soil_moisture_data.json", "r") as f:
+            soil = json.load(f)
+        soil_moisture = soil['soil_moisture_percent']
+    except Exception as e:
+        print(f"❌ Failed to load soil moisture data: {e}")
+        return
 
-    users = pd.read_csv("users.csv")
+    try:
+        users = pd.read_csv("users.csv")
+    except Exception as e:
+        print(f"❌ Failed to read users.csv: {e}")
+        return
 
     for _, row in users.iterrows():
         username = row["username"]
