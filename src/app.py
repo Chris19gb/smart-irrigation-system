@@ -105,13 +105,22 @@ if st.session_state.logged_in:
     st.markdown('<div class="main-title">Smart Irrigation System Dashboard</div>', unsafe_allow_html=True)
     st.markdown("---")
 
+    # ✅ Fixed function indentation
     def fetch_live_weather():
         params = {'q': LOCATION, 'appid': WEATHER_API_KEY, 'units': 'metric'}
         try:
             response = requests.get(WEATHER_API_URL, params=params)
             response.raise_for_status()
-            return response.json()
-        except:
+            data = response.json()
+
+            os.makedirs("data", exist_ok=True)
+            with open("data/weather_data.json", "w") as f:
+                json.dump(data, f, indent=4)
+
+            return data
+
+        except Exception as e:
+            st.warning(f"⚠️ Live weather fetch failed: {e}")
             if os.path.exists("data/weather_data.json"):
                 with open("data/weather_data.json") as f:
                     return json.load(f)
@@ -120,8 +129,6 @@ if st.session_state.logged_in:
                 st.stop()
 
     weather_data = fetch_live_weather()
-    with open("data/weather_data.json", "w") as f:
-        json.dump(weather_data, f, indent=4)
 
     temp = weather_data['main'].get('temp', 0)
     humidity = weather_data['main'].get('humidity', 0)
