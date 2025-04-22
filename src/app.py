@@ -112,7 +112,7 @@ if st.session_state.logged_in:
             response.raise_for_status()
             data = response.json()
             os.makedirs("data", exist_ok=True)
-            with open("data/weather_data.json", "w") as f:
+            with open("src/data/weather_data.json", "w") as f:
                 json.dump(data, f, indent=4)
             return data
         except Exception as e:
@@ -134,9 +134,9 @@ if st.session_state.logged_in:
     rainfall = weather_data.get("rain", {}).get("1h", 0) or 0
 
     try:
-        with open("data/soil_moisture_data.json") as f:
+        with open("src/data/soil_moisture_data.json") as f:
             soil_data = json.load(f)
-        with open("data/ndvi_data.json") as f:
+        with open("src/data/ndvi_data.json") as f:
             ndvi_data = json.load(f)
     except Exception as e:
         st.error(f"Error loading soil or NDVI data: {e}")
