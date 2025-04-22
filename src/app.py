@@ -117,8 +117,8 @@ if st.session_state.logged_in:
             return data
         except Exception as e:
             st.warning(f"⚠️ Live weather fetch failed: {e}")
-            if os.path.exists("data/weather_data.json"):
-                with open("data/weather_data.json") as f:
+            if os.path.exists("src/data/weather_data.json"):
+                with open('src/data/soil_moisture_data.json') as f:
                     return json.load(f)
             else:
                 st.error("❌ No weather data available.")
