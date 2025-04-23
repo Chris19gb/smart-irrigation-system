@@ -28,4 +28,4 @@ jobs:
 
       - name: ⚙️ Run Daily Logger
         run: |
-          python src/logger/daily_logger.py
+          python src/daily_logger.py
