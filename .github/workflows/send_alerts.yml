@@ -35,4 +35,4 @@ jobs:
           pip install -r ../requirements.txt
 
       - name: 🚀 Run Smart Irrigation Alert
-        run: python send_daily_alerts.py
+        run: python src/send_daily_alerts.py
