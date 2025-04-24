@@ -1,0 +1,12 @@
+app = "smart-irrigation-system"
+primary_region = "jnb"  # Change to your nearest region, e.g., "jnb" for Johannesburg
+
+[env]
+PORT = "8501"
+
+[[services]]
+  internal_port = 8501
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
